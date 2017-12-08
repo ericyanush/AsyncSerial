@@ -12,9 +12,9 @@ public protocol SerialPortReceiveDelegate: class {
 
 public class SerialPort {
     
-    weak var delegate: SerialPortReceiveDelegate?
+    public weak var delegate: SerialPortReceiveDelegate?
     
-    fileprivate(set) var path: String
+    public fileprivate(set) var path: String
     
     fileprivate var fileDescriptor: Int32?
     fileprivate var dispatchQueue = DispatchQueue(label: "SwiftSerial Event Queue")
@@ -24,9 +24,9 @@ public class SerialPort {
     fileprivate var writeBuffer = Data()
     fileprivate var bufferLock = NSLock()
     
-    var isOpen: Bool { return fileDescriptor != nil }
+    public var isOpen: Bool { return fileDescriptor != nil }
     
-    var hasPendingTransmitData: Bool {
+    public var hasPendingTransmitData: Bool {
         let dataCount: Int
         bufferLock.lock()
         dataCount = writeBuffer.count
@@ -38,7 +38,6 @@ public class SerialPort {
         self.path = path
     }
 
-    
     public enum OpenType {
         case readOnly, writeOnly, readWrite
     }
