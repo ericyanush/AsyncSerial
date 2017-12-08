@@ -17,7 +17,7 @@ public class SerialPort {
     public fileprivate(set) var path: String
     
     fileprivate var fileDescriptor: Int32?
-    fileprivate var dispatchQueue = DispatchQueue(label: "SwiftSerial Event Queue")
+    fileprivate var eventQueue = DispatchQueue(label: "SwiftSerial Event Queue")
     fileprivate var readSource: DispatchSourceRead?
     fileprivate var writeSource: DispatchSourceWrite?
     
@@ -61,12 +61,11 @@ public class SerialPort {
         }
         fileDescriptor = descriptor
         
-        let queue = DispatchQueue(label: "SwiftSerial Event Queue")
-        let readSource = DispatchSource.makeReadSource(fileDescriptor: descriptor, queue: queue)
-        let writeSource = DispatchSource.makeWriteSource(fileDescriptor: descriptor, queue: queue)
-        readSource.setEventHandler { [weak self] in self?.readData() }
-        readSource.resume()
-        writeSource.setEventHandler { [weak self] in self?.processOutgoingData() }
+        readSource = DispatchSource.makeReadSource(fileDescriptor: descriptor, queue: eventQueue)
+        writeSource = DispatchSource.makeWriteSource(fileDescriptor: descriptor, queue: eventQueue)
+        readSource!.setEventHandler { [weak self] in self?.readData() }
+        readSource!.resume()
+        writeSource!.setEventHandler { [weak self] in self?.processOutgoingData() }
     }
     
     public func set(baudRate: BaudRate,
@@ -114,7 +113,7 @@ public class SerialPort {
     
     public func send(_ data: Data) throws {
         guard fileDescriptor != nil else { throw PortError.portNotOpen }
-        dispatchQueue.async {
+        eventQueue.async {
             self.bufferLock.lock()
             defer { self.bufferLock.unlock() }
             self.writeBuffer.append(data)
