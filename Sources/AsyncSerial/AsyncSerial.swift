@@ -116,8 +116,9 @@ public class SerialPort {
         eventQueue.async {
             self.bufferLock.lock()
             defer { self.bufferLock.unlock() }
+            let resumeRequired = self.writeBuffer.count == 0
             self.writeBuffer.append(data)
-            self.writeSource?.resume()
+            if resumeRequired { self.writeSource?.resume() }
         }
     }
     
