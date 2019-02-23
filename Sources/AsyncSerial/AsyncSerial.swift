@@ -164,8 +164,8 @@ extension SerialPort {
         
         let bufferSize = 1024
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
-        defer { buffer.deallocate(capacity: bufferSize) }
-        
+        defer { buffer.deallocate() }
+            
         let bytesRead = read(fileDescriptor, buffer, bufferSize)
         let data = Data(bytes: buffer, count: bytesRead)
         
